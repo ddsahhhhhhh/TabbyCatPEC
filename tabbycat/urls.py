@@ -8,17 +8,29 @@ from django.urls import include, path
 from django.utils.translation import gettext as _
 from django.views.i18n import JavaScriptCatalog
 
+from django.http import JsonResponse
 import tournaments.views
 from importer.views import LoadDemoView
 from users.views import BlankSiteStartView
 
 admin.autodiscover()
 
+def bot_health_check(request):
+    return JsonResponse({
+        "status": "ok",
+        "message": "Tabbycat is active and running!"
+    }, status=200)
+
 # ==============================================================================
 # Base Patterns
 # ==============================================================================
 
 urlpatterns = [
+
+    # Health Check for Uptime Bots (Keep-Alive)
+    path('bot', bot_health_check, name='bot-health-check'),
+    path('bot/', bot_health_check, name='bot-health-check-slash'),
+    path('healthz', bot_health_check, name='healthz'),
 
     # Indices
     path('',
