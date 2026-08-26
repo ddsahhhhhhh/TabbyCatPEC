@@ -71,6 +71,11 @@ class TestEmailView(WarnAboutLegacySendgridConfigVarsMixin, AdministratorMixin, 
                 _("There was an error sending the test email: %(error)s") % {'error': str(e)})
             logger.warning("Other error in test email", exc_info=True)
 
+        except Exception as e:
+            messages.error(self.request,
+                _("There was an unexpected error sending the test email: %(error)s") % {'error': str(e)})
+            logger.exception("Unexpected error in test email")
+
         else:
             messages.success(self.request,
                 _("A test email has been sent to %(recipient)s.") % {'recipient': recipient})
