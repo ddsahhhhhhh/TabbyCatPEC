@@ -113,13 +113,22 @@ if not os.environ.get('DISABLE_SENTRY'):
 # Email Configuration
 # ==============================================================================
 
-if os.environ.get('EMAIL_HOST', ''):
+if os.environ.get('EMAIL_HOST') or os.environ.get('EMAIL_HOST_USER'):
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
     EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
     EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
     EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-    EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'true').lower() in ['true', '1', 't']
+    
+    if EMAIL_PORT == 465:
+        EMAIL_USE_SSL = True
+        EMAIL_USE_TLS = False
+    else:
+        EMAIL_USE_SSL = False
+        EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'true').lower() in ['true', '1', 't', 'yes']
+        
+    EMAIL_TIMEOUT = 15
     DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', os.environ.get('EMAIL_HOST_USER', 'Tabbycat <noreply@tabbycat.org>'))
     SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
 
