@@ -44,33 +44,53 @@ DATABASES = {
 }
 
 # ==============================================================================
-# Redis
+# Redis / Cache
 # ==============================================================================
 
 REDIS_HOST = os.environ.get('REDIS_HOST')
-REDIS_PORT = os.environ.get('REDIS_PORT')
+REDIS_PORT = os.environ.get('REDIS_PORT', '6379')
+REDIS_URL = os.environ.get('REDIS_URL')
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://" + REDIS_HOST + ":" + REDIS_PORT,
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "SOCKET_CONNECT_TIMEOUT": 5,
-            "SOCKET_TIMEOUT": 60,
-            "IGNORE_EXCEPTIONS": True, # Don't crash on say ConnectionError due to limits
-        },
-    },
-}
+if REDIS_URL:
+    redis_location = REDIS_URL
+elif REDIS_HOST:
+    redis_location = f"redis://{REDIS_HOST}:{REDIS_PORT}"
+else:
+    redis_location = None
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": ["redis://" + REDIS_HOST + ":" + REDIS_PORT],
+if redis_location:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": redis_location,
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "SOCKET_CONNECT_TIMEOUT": 5,
+                "SOCKET_TIMEOUT": 60,
+                "IGNORE_EXCEPTIONS": True,  # Don't crash on connection error due to limits
+            },
         },
-    },
-}
+    }
+
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [redis_location],
+            },
+        },
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        }
+    }
 
 # ==============================================================================
 # Sentry
