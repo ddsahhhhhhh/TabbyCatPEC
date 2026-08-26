@@ -1,0 +1,27 @@
+========================================================================
+             TABBYCAT LOCALHOST SETUP & RUNNING GUIDE
+========================================================================
+
+1. HOW TO START TABBYCAT (1-CLICK):
+----------------------------------
+- Make sure Docker Desktop is open and running on your computer.
+- Double-click "START_TABBYCAT.bat".
+- It will automatically start all background containers (Postgres, Redis, Web, Worker)
+  and open your web browser to:
+  http://localhost:8000/
+
+2. HOW TO STOP TABBYCAT:
+------------------------
+- Double-click "STOP_TABBYCAT.bat".
+- All containers will safely stop without losing any tournament data.
+
+3. HOW TO CREATE ADMIN (SUPERUSER) LOCALLY:
+-------------------------------------------
+- Open PowerShell in this folder and run:
+  docker compose run --rm web python ./tabbycat/manage.py createsuperuser
+
+4. ONLINE VS LOCALHOST URLS:
+----------------------------
+- Localhost (This PC only): http://localhost:8000/
+- Cloud (For everyone/internet): https://tabbycatpec.onrender.com/
+========================================================================
